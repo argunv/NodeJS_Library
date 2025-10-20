@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # PostgreSQL база данных для разработки
+  db:
+    image: postgres:15-alpine
+    container_name: library_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: library_catalog_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - library_dev_network
+
+  # Node.js приложение для разработки
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: library_app_dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:password@db:5432/library_catalog_dev?schema=public
+      JWT_SECRET: dev-secret-key
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - library_dev_network
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  library_dev_network:
+    driver: bridge

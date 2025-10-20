@@ -1,0 +1,30 @@
+# Dockerfile для разработки
+FROM node:18-alpine
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Устанавливаем nodemon глобально для разработки
+RUN npm install -g nodemon
+
+# Копируем package.json и package-lock.json
+COPY package*.json ./
+
+# Устанавливаем все зависимости (включая dev)
+RUN npm install
+
+# Копируем исходный код
+COPY . .
+
+# Генерируем Prisma клиент
+RUN npx prisma generate
+
+# Открываем порт
+EXPOSE 3000
+
+# Переменные окружения для разработки
+ENV NODE_ENV=development
+ENV PORT=3000
+
+# Команда запуска в режиме разработки
+CMD ["npm", "run", "dev"]
