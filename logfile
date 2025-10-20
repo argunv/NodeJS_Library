@@ -1,0 +1,10 @@
+2025-10-20 21:47:56.257 MSK [96945] LOG:  starting PostgreSQL 14.18 (Homebrew) on x86_64-apple-darwin23.6.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-10-20 21:47:56.261 MSK [96945] LOG:  listening on IPv6 address "::1", port 5432
+2025-10-20 21:47:56.261 MSK [96945] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-20 21:47:56.262 MSK [96945] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-20 21:47:56.268 MSK [96946] LOG:  database system was shut down at 2025-10-20 21:47:53 MSK
+2025-10-20 21:47:56.274 MSK [96945] LOG:  database system is ready to accept connections
+2025-10-20 21:48:10.759 MSK [97202] FATAL:  role "postgres" does not exist
+2025-10-20 21:48:10.765 MSK [97203] FATAL:  role "postgres" does not exist
+2025-10-20 21:48:26.780 MSK [97477] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2025-10-20 21:48:26.780 MSK [97477] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC

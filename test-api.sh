@@ -3,7 +3,7 @@
 # Скрипт для тестирования Library Catalog API
 # Убедитесь, что сервер запущен на http://localhost:3000
 
-BASE_URL="http://localhost:3000"
+BASE_URL="http://localhost:3001"
 API_URL="$BASE_URL/api"
 
 echo "🚀 Тестирование Library Catalog API"
