@@ -7,7 +7,7 @@ describe('Books API', () => {
   beforeEach(async () => {
     // Создаем пользователя и получаем токен для каждого теста
     const userData = {
-      email: 'books@example.com',
+      email: `books${Date.now()}@example.com`,
       password: 'password123',
       name: 'Books User'
     };
@@ -16,7 +16,24 @@ describe('Books API', () => {
       .post('/api/auth/register')
       .send(userData);
 
-    authToken = registerResponse.body.token;
+    // Проверяем, что регистрация прошла успешно
+    if (registerResponse.status === 201 && registerResponse.body.token) {
+      authToken = registerResponse.body.token;
+    } else {
+      // Если регистрация не удалась, попробуем войти
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: userData.email,
+          password: userData.password
+        });
+      
+      if (loginResponse.status === 200 && loginResponse.body.token) {
+        authToken = loginResponse.body.token;
+      } else {
+        throw new Error('Failed to authenticate for tests');
+      }
+    }
   });
 
   describe('GET /api/books', () => {
