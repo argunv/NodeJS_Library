@@ -33,20 +33,20 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/books', require('./routes/books'));
 
-// Error handling middleware
-app.use((err, req, res) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-  });
-});
-
-// 404 handler
+// 404 handler (должен быть ПЕРЕД error handler)
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
     message: `Route ${req.originalUrl} not found`
+  });
+});
+
+// Error handling middleware (должен иметь 4 параметра: err, req, res, next)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   });
 });
 
