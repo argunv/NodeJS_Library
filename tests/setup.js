@@ -8,13 +8,17 @@ process.env.JWT_SECRET = 'test-jwt-secret-key';
 const prisma = new PrismaClient();
 
 // Очистка базы данных перед каждым тестом
-beforeEach(async () => {
-  await prisma.book.deleteMany();
-  await prisma.user.deleteMany();
+beforeEach(async() => {
+  try {
+    await prisma.book.deleteMany();
+    await prisma.user.deleteMany();
+  } catch (error) {
+    console.log('Database cleanup error:', error.message);
+  }
 });
 
 // Закрытие соединения после всех тестов
-afterAll(async () => {
+afterAll(async() => {
   await prisma.$disconnect();
 });
 

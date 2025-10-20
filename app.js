@@ -34,7 +34,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/books', require('./routes/books'));
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).json({
     error: 'Internal Server Error',

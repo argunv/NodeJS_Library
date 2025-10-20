@@ -4,7 +4,7 @@ const app = require('../../app');
 describe('Books API', () => {
   let authToken;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     // Создаем пользователя и получаем токен для каждого теста
     const userData = {
       email: `books${Date.now()}@example.com`,
@@ -31,13 +31,15 @@ describe('Books API', () => {
       if (loginResponse.status === 200 && loginResponse.body.token) {
         authToken = loginResponse.body.token;
       } else {
+        console.error('Registration response:', registerResponse.status, registerResponse.body);
+        console.error('Login response:', loginResponse.status, loginResponse.body);
         throw new Error('Failed to authenticate for tests');
       }
     }
   });
 
   describe('GET /api/books', () => {
-    it('should get all books (empty list initially)', async () => {
+    it('should get all books (empty list initially)', async() => {
       const response = await request(app)
         .get('/api/books')
         .set('Authorization', `Bearer ${authToken}`)
@@ -49,7 +51,7 @@ describe('Books API', () => {
       expect(Array.isArray(response.body.data)).toBe(true);
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 401 without authentication', async() => {
       const response = await request(app)
         .get('/api/books')
         .expect(401);
@@ -59,7 +61,7 @@ describe('Books API', () => {
   });
 
   describe('POST /api/books', () => {
-    it('should create a new book successfully', async () => {
+    it('should create a new book successfully', async() => {
       const bookData = {
         title: 'Test Book',
         author: 'Test Author',
@@ -80,7 +82,7 @@ describe('Books API', () => {
       expect(response.body.data.author).toBe(bookData.author);
     });
 
-    it('should return 400 for invalid book data', async () => {
+    it('should return 400 for invalid book data', async() => {
       const invalidBookData = {
         title: '', // Empty title should fail validation
         author: 'Test Author'
@@ -95,7 +97,7 @@ describe('Books API', () => {
       expect(response.body).toHaveProperty('error', 'Validation Error');
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 401 without authentication', async() => {
       const bookData = {
         title: 'Test Book',
         author: 'Test Author'
@@ -113,7 +115,7 @@ describe('Books API', () => {
   describe('GET /api/books/:id', () => {
     let bookId;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       // Создаем книгу для тестов
       const bookData = {
         title: 'Test Book for Get',
@@ -129,7 +131,7 @@ describe('Books API', () => {
       bookId = createResponse.body.data.id;
     });
 
-    it('should get a book by ID', async () => {
+    it('should get a book by ID', async() => {
       const response = await request(app)
         .get(`/api/books/${bookId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -140,7 +142,7 @@ describe('Books API', () => {
       expect(response.body.data.id).toBe(bookId);
     });
 
-    it('should return 404 for non-existent book', async () => {
+    it('should return 404 for non-existent book', async() => {
       const nonExistentId = 'non-existent-id';
 
       const response = await request(app)
@@ -155,7 +157,7 @@ describe('Books API', () => {
   describe('PUT /api/books/:id', () => {
     let bookId;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       // Создаем книгу для тестов
       const bookData = {
         title: 'Test Book for Update',
@@ -171,7 +173,7 @@ describe('Books API', () => {
       bookId = createResponse.body.data.id;
     });
 
-    it('should update a book successfully', async () => {
+    it('should update a book successfully', async() => {
       const updateData = {
         title: 'Updated Book Title',
         author: 'Updated Author'
@@ -189,7 +191,7 @@ describe('Books API', () => {
       expect(response.body.data.author).toBe(updateData.author);
     });
 
-    it('should return 404 for non-existent book', async () => {
+    it('should return 404 for non-existent book', async() => {
       const nonExistentId = 'non-existent-id';
       const updateData = {
         title: 'Updated Title'
@@ -208,7 +210,7 @@ describe('Books API', () => {
   describe('DELETE /api/books/:id', () => {
     let bookId;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       // Создаем книгу для тестов
       const bookData = {
         title: 'Test Book for Delete',
@@ -224,7 +226,7 @@ describe('Books API', () => {
       bookId = createResponse.body.data.id;
     });
 
-    it('should delete a book successfully', async () => {
+    it('should delete a book successfully', async() => {
       const response = await request(app)
         .delete(`/api/books/${bookId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -233,7 +235,7 @@ describe('Books API', () => {
       expect(response.body).toHaveProperty('message', 'Book deleted successfully');
     });
 
-    it('should return 404 for non-existent book', async () => {
+    it('should return 404 for non-existent book', async() => {
       const nonExistentId = 'non-existent-id';
 
       const response = await request(app)

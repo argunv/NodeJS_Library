@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../config/database');
 
 // Регистрация пользователя
-const register = async (req, res) => {
+const register = async(req, res) => {
   try {
     const { email, password, name } = req.body;
 
@@ -60,7 +60,7 @@ const register = async (req, res) => {
 };
 
 // Вход пользователя
-const login = async (req, res) => {
+const login = async(req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -113,7 +113,7 @@ const login = async (req, res) => {
 };
 
 // Получение профиля пользователя
-const getProfile = async (req, res) => {
+const getProfile = async(req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },

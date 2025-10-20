@@ -1,13 +1,13 @@
 const prisma = require('../config/database');
 
 // Получить все книги
-const getAllBooks = async (req, res) => {
+const getAllBooks = async(req, res) => {
   try {
     const { page = 1, limit = 10, search, author } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = {};
-    
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
@@ -15,7 +15,7 @@ const getAllBooks = async (req, res) => {
         { description: { contains: search, mode: 'insensitive' } }
       ];
     }
-    
+
     if (author) {
       where.author = { contains: author, mode: 'insensitive' };
     }
@@ -50,7 +50,7 @@ const getAllBooks = async (req, res) => {
 };
 
 // Получить книгу по ID
-const getBookById = async (req, res) => {
+const getBookById = async(req, res) => {
   try {
     const { id } = req.params;
 
@@ -79,7 +79,7 @@ const getBookById = async (req, res) => {
 };
 
 // Создать новую книгу
-const createBook = async (req, res) => {
+const createBook = async(req, res) => {
   try {
     const bookData = req.body;
 
@@ -115,7 +115,7 @@ const createBook = async (req, res) => {
 };
 
 // Обновить книгу
-const updateBook = async (req, res) => {
+const updateBook = async(req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -165,7 +165,7 @@ const updateBook = async (req, res) => {
 };
 
 // Удалить книгу
-const deleteBook = async (req, res) => {
+const deleteBook = async(req, res) => {
   try {
     const { id } = req.params;
 

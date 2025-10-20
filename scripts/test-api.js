@@ -8,8 +8,7 @@
 const https = require('https');
 const http = require('http');
 
-const BASE_URL = 'http://localhost:3000';
-const API_URL = `${BASE_URL}/api`;
+// const BASE_URL = 'http://localhost:3000';
 
 // Цвета для консоли
 const colors = {
@@ -24,7 +23,7 @@ const colors = {
 function makeRequest(options, data = null) {
   return new Promise((resolve, reject) => {
     const protocol = options.protocol === 'https:' ? https : http;
-    
+
     const req = protocol.request(options, (res) => {
       let body = '';
       res.on('data', (chunk) => body += chunk);
@@ -38,11 +37,11 @@ function makeRequest(options, data = null) {
     });
 
     req.on('error', reject);
-    
+
     if (data) {
       req.write(JSON.stringify(data));
     }
-    
+
     req.end();
   });
 }
@@ -74,7 +73,7 @@ async function runTests() {
       path: '/api/health',
       headers: { 'Content-Type': 'application/json' }
     });
-    
+
     const healthSuccess = healthResponse.statusCode === 200;
     logResult('Health Check', healthSuccess, `Status: ${healthResponse.statusCode}`);
     if (healthSuccess) testResults.passed++; else testResults.failed++;
@@ -95,7 +94,7 @@ async function runTests() {
 
     const registerSuccess = registerResponse.statusCode === 201;
     logResult('Регистрация пользователя', registerSuccess, `Status: ${registerResponse.statusCode}`);
-    
+
     if (registerSuccess) {
       const registerData = JSON.parse(registerResponse.body);
       token = registerData.token;
@@ -129,7 +128,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/auth/profile',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -146,7 +145,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/books',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -160,7 +159,7 @@ async function runTests() {
 
     const createBookSuccess = createBookResponse.statusCode === 201;
     logResult('Создание книги', createBookSuccess, `Status: ${createBookResponse.statusCode}`);
-    
+
     if (createBookSuccess) {
       const bookData = JSON.parse(createBookResponse.body);
       bookId = bookData.data.id;
@@ -177,7 +176,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/books',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -194,7 +193,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: `/api/books/${bookId}`,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -211,7 +210,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: `/api/books/${bookId}`,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -231,7 +230,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/books?search=gatsby&limit=5',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -262,7 +261,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/books',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer invalid-token'
       }
@@ -279,7 +278,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: '/api/books',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -299,7 +298,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: `/api/books/${bookId}`,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -316,7 +315,7 @@ async function runTests() {
       hostname: 'localhost',
       port: 3000,
       path: `/api/books/${bookId}`,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
@@ -339,13 +338,13 @@ async function runTests() {
   console.log(`${colors.red}❌ Провалено: ${testResults.failed}${colors.reset}`);
   console.log(`📈 Общий процент успеха: ${Math.round((testResults.passed / (testResults.passed + testResults.failed)) * 100)}%`);
   console.log('');
-  
+
   if (testResults.failed === 0) {
     console.log(`${colors.green}🎉 Все тесты прошли успешно!${colors.reset}`);
   } else {
     console.log(`${colors.yellow}⚠️  Некоторые тесты не прошли. Проверьте настройки сервера.${colors.reset}`);
   }
-  
+
   console.log('');
   console.log(`${colors.blue}💡 Для просмотра документации API откройте: http://localhost:3000/api-docs${colors.reset}`);
 }

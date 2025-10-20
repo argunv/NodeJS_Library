@@ -1,10 +1,10 @@
 const express = require('express');
-const { 
-  getAllBooks, 
-  getBookById, 
-  createBook, 
-  updateBook, 
-  deleteBook 
+const {
+  getAllBooks,
+  getBookById,
+  createBook,
+  updateBook,
+  deleteBook
 } = require('../controllers/bookController');
 const { authenticateToken } = require('../middleware/auth');
 const { validate, bookSchema, bookUpdateSchema } = require('../middleware/validation');
