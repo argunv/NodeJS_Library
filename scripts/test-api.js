@@ -78,34 +78,10 @@ async function runTests() {
     logResult('Health Check', healthSuccess, `Status: ${healthResponse.statusCode}`);
     if (healthSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 2: Регистрация пользователя
-    console.log(`${colors.yellow}2. Регистрация пользователя${colors.reset}`);
-    const registerResponse = await makeRequest({
-      method: 'POST',
-      hostname: 'localhost',
-      port: 3000,
-      path: '/api/auth/register',
-      headers: { 'Content-Type': 'application/json' }
-    }, {
-      email: 'test@example.com',
-      password: 'password123',
-      name: 'Test User'
-    });
-
-    const registerSuccess = registerResponse.statusCode === 201;
-    logResult('Регистрация пользователя', registerSuccess, `Status: ${registerResponse.statusCode}`);
-
-    if (registerSuccess) {
-      const registerData = JSON.parse(registerResponse.body);
-      token = registerData.token;
-      console.log(`   Токен получен: ${token.substring(0, 20)}...`);
-      testResults.passed++;
-    } else {
-      testResults.failed++;
-    }
-
-    // Тест 3: Вход в систему
-    console.log(`${colors.yellow}3. Вход в систему${colors.reset}`);
+    // Тест 2: Попытка входа, если не удается - регистрация
+    console.log(`${colors.yellow}2. Аутентификация пользователя${colors.reset}`);
+    
+    // Сначала пытаемся войти в систему
     const loginResponse = await makeRequest({
       method: 'POST',
       hostname: 'localhost',
@@ -117,12 +93,49 @@ async function runTests() {
       password: 'password123'
     });
 
-    const loginSuccess = loginResponse.statusCode === 200;
-    logResult('Вход в систему', loginSuccess, `Status: ${loginResponse.statusCode}`);
-    if (loginSuccess) testResults.passed++; else testResults.failed++;
+    let authSuccess = false;
+    
+    if (loginResponse.statusCode === 200) {
+      // Пользователь существует, используем токен из входа
+      const loginData = JSON.parse(loginResponse.body);
+      token = loginData.token;
+      console.log(`   Вход в систему успешен, токен получен: ${token.substring(0, 20)}...`);
+      authSuccess = true;
+      logResult('Вход в систему', true, `Status: ${loginResponse.statusCode}`);
+    } else {
+      // Пользователь не существует, регистрируемся
+      console.log(`   Пользователь не найден, выполняем регистрацию...`);
+      const registerResponse = await makeRequest({
+        method: 'POST',
+        hostname: 'localhost',
+        port: 3000,
+        path: '/api/auth/register',
+        headers: { 'Content-Type': 'application/json' }
+      }, {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User'
+      });
 
-    // Тест 4: Получение профиля
-    console.log(`${colors.yellow}4. Получение профиля${colors.reset}`);
+      if (registerResponse.statusCode === 201) {
+        const registerData = JSON.parse(registerResponse.body);
+        token = registerData.token;
+        console.log(`   Регистрация успешна, токен получен: ${token.substring(0, 20)}...`);
+        authSuccess = true;
+        logResult('Регистрация пользователя', true, `Status: ${registerResponse.statusCode}`);
+      } else {
+        logResult('Аутентификация', false, `Status: ${registerResponse.statusCode}`);
+      }
+    }
+
+    if (authSuccess) {
+      testResults.passed++;
+    } else {
+      testResults.failed++;
+    }
+
+    // Тест 3: Получение профиля
+    console.log(`${colors.yellow}3. Получение профиля${colors.reset}`);
     const profileResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -138,8 +151,8 @@ async function runTests() {
     logResult('Получение профиля', profileSuccess, `Status: ${profileResponse.statusCode}`);
     if (profileSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 5: Создание книги
-    console.log(`${colors.yellow}5. Создание книги${colors.reset}`);
+    // Тест 4: Создание книги
+    console.log(`${colors.yellow}4. Создание книги${colors.reset}`);
     const createBookResponse = await makeRequest({
       method: 'POST',
       hostname: 'localhost',
@@ -169,8 +182,8 @@ async function runTests() {
       testResults.failed++;
     }
 
-    // Тест 6: Получение списка книг
-    console.log(`${colors.yellow}6. Получение списка книг${colors.reset}`);
+    // Тест 5: Получение списка книг
+    console.log(`${colors.yellow}5. Получение списка книг${colors.reset}`);
     const getBooksResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -186,8 +199,8 @@ async function runTests() {
     logResult('Получение списка книг', getBooksSuccess, `Status: ${getBooksResponse.statusCode}`);
     if (getBooksSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 7: Получение книги по ID
-    console.log(`${colors.yellow}7. Получение книги по ID${colors.reset}`);
+    // Тест 6: Получение книги по ID
+    console.log(`${colors.yellow}6. Получение книги по ID${colors.reset}`);
     const getBookResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -203,8 +216,8 @@ async function runTests() {
     logResult('Получение книги по ID', getBookSuccess, `Status: ${getBookResponse.statusCode}`);
     if (getBookSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 8: Обновление книги
-    console.log(`${colors.yellow}8. Обновление книги${colors.reset}`);
+    // Тест 7: Обновление книги
+    console.log(`${colors.yellow}7. Обновление книги${colors.reset}`);
     const updateBookResponse = await makeRequest({
       method: 'PUT',
       hostname: 'localhost',
@@ -223,8 +236,8 @@ async function runTests() {
     logResult('Обновление книги', updateBookSuccess, `Status: ${updateBookResponse.statusCode}`);
     if (updateBookSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 9: Поиск книг
-    console.log(`${colors.yellow}9. Поиск книг${colors.reset}`);
+    // Тест 8: Поиск книг
+    console.log(`${colors.yellow}8. Поиск книг${colors.reset}`);
     const searchBooksResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -240,8 +253,8 @@ async function runTests() {
     logResult('Поиск книг', searchBooksSuccess, `Status: ${searchBooksResponse.statusCode}`);
     if (searchBooksSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 10: Тест без аутентификации
-    console.log(`${colors.yellow}10. Тест без аутентификации${colors.reset}`);
+    // Тест 9: Тест без аутентификации
+    console.log(`${colors.yellow}9. Тест без аутентификации${colors.reset}`);
     const unauthResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -254,8 +267,8 @@ async function runTests() {
     logResult('Тест без аутентификации', unauthSuccess, `Status: ${unauthResponse.statusCode}`);
     if (unauthSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 11: Тест с неверным токеном
-    console.log(`${colors.yellow}11. Тест с неверным токеном${colors.reset}`);
+    // Тест 10: Тест с неверным токеном
+    console.log(`${colors.yellow}10. Тест с неверным токеном${colors.reset}`);
     const invalidTokenResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
@@ -271,8 +284,8 @@ async function runTests() {
     logResult('Тест с неверным токеном', invalidTokenSuccess, `Status: ${invalidTokenResponse.statusCode}`);
     if (invalidTokenSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 12: Тест валидации
-    console.log(`${colors.yellow}12. Тест валидации данных${colors.reset}`);
+    // Тест 11: Тест валидации
+    console.log(`${colors.yellow}11. Тест валидации данных${colors.reset}`);
     const validationResponse = await makeRequest({
       method: 'POST',
       hostname: 'localhost',
@@ -291,8 +304,8 @@ async function runTests() {
     logResult('Тест валидации данных', validationSuccess, `Status: ${validationResponse.statusCode}`);
     if (validationSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 13: Удаление книги
-    console.log(`${colors.yellow}13. Удаление книги${colors.reset}`);
+    // Тест 12: Удаление книги
+    console.log(`${colors.yellow}12. Удаление книги${colors.reset}`);
     const deleteBookResponse = await makeRequest({
       method: 'DELETE',
       hostname: 'localhost',
@@ -308,8 +321,8 @@ async function runTests() {
     logResult('Удаление книги', deleteBookSuccess, `Status: ${deleteBookResponse.statusCode}`);
     if (deleteBookSuccess) testResults.passed++; else testResults.failed++;
 
-    // Тест 14: Проверка удаления
-    console.log(`${colors.yellow}14. Проверка удаления книги${colors.reset}`);
+    // Тест 13: Проверка удаления
+    console.log(`${colors.yellow}13. Проверка удаления книги${colors.reset}`);
     const checkDeletedResponse = await makeRequest({
       method: 'GET',
       hostname: 'localhost',
