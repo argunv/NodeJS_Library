@@ -1,15 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
-
-// Устанавливаем тестовую базу данных
-process.env.DATABASE_URL = 'postgresql://vladislavargun@localhost:5432/library_catalog_test?schema=public';
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret-key';
-
-const prisma = new PrismaClient();
+// Используем глобальный экземпляр Prisma из global-setup.js
+const prisma = global.prisma;
 
 // Очистка базы данных перед каждым тестом
 beforeEach(async() => {
   try {
+    // Очищаем в правильном порядке (сначала зависимые таблицы)
     await prisma.book.deleteMany();
     await prisma.user.deleteMany();
   } catch (error) {
@@ -19,7 +14,12 @@ beforeEach(async() => {
 
 // Закрытие соединения после всех тестов
 afterAll(async() => {
-  await prisma.$disconnect();
+  try {
+    // Не закрываем соединение здесь, так как это делается в global-setup
+    // await prisma.$disconnect();
+  } catch (error) {
+    console.log('Database disconnect error:', error.message);
+  }
 });
 
 module.exports = { prisma };

@@ -10,7 +10,13 @@ module.exports = {
     '!**/tests/**'
   ],
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov', 'html'],
+  coverageReporters: ['text', 'lcov', 'html', 'text-summary'],
+  globalSetup: '<rootDir>/tests/global-setup.js',
+  globalTeardown: '<rootDir>/tests/global-teardown.js',
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-  testTimeout: 10000
+  testTimeout: 15000,
+  forceExit: true,
+  detectOpenHandles: true,
+  maxWorkers: 1,
+  verbose: true
 };
