@@ -18,6 +18,22 @@ services:
     networks:
       - library_dev_network
 
+  # Сервис для выполнения миграций в dev
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: library_migrate_dev
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@db:5432/library_catalog_dev?schema=public
+    depends_on:
+      - db
+    networks:
+      - library_dev_network
+    command: ["npx", "prisma", "migrate", "deploy"]
+    restart: "no"
+
   # Node.js приложение для разработки
   app:
     build:
@@ -34,13 +50,13 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      migrate:
+        condition: service_completed_successfully
     networks:
       - library_dev_network
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev
 
 volumes:
   postgres_dev_data:

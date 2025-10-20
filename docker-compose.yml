@@ -24,6 +24,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # Сервис для выполнения миграций
+  migrate:
+    build: .
+    container_name: library_migrate
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:password@db:5432/library_catalog?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - library_network
+    command: ["npx", "prisma", "migrate", "deploy"]
+    restart: "no"
+
   # Node.js приложение
   app:
     build: .
@@ -38,8 +53,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - library_network
     volumes:
