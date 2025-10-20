@@ -50,23 +50,8 @@ services:
       timeout: 10s
       retries: 3
 
-  # Redis для кеширования (опционально)
-  redis:
-    image: redis:7-alpine
-    container_name: library_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - library_network
-    command: redis-server --appendonly yes
-
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:
