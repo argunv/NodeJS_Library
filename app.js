@@ -21,6 +21,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
