@@ -11,7 +11,7 @@
     "test:ci": "jest --coverage --watchAll=false --detectOpenHandles --forceExit",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
-    "docker:build": "docker build -t library-catalog-api .",
+    "docker:build": "docker-compose build",
     "docker:run": "docker run -p 3000:3000 library-catalog-api",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
